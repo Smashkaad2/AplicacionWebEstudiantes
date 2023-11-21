@@ -16,7 +16,7 @@ function cargaEstudiantes() {
         trHTML +=
           '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
         trHTML +=
-          '<button type="button" class="btn btn-outline-secondary" onclick="traeEstudiante(' + object["id"] + ')">Notas</button>';
+          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object["id"] + ')">Notas</button>';
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
@@ -64,6 +64,35 @@ function creaEstudiante() {
       cargaEstudiantes();
     }
   };
+}
+
+function mostrarNotasEstudiante(id) {
+  console.log("Flga");
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "http://localhost:8080/api/estudiante/" + id);
+  xhttp.send();
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+      var trHTML = "";
+      const objects = JSON.parse(this.responseText);
+      for (let object of objects["notas"]) {
+        trHTML += "<tr>";
+        trHTML += "<td>" + object["id"] + "</td>";
+        trHTML += "<td>" + object["observacion"] + "</td>";
+        trHTML += "<td>" + object["valor"] + "</td>";
+        trHTML += "<td>" + object["porcentaje"] + "</td>";
+        trHTML +=
+          '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
+        trHTML +=
+          '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
+        trHTML += "</tr>";
+      }
+      document.getElementById("mytableNotas").innerHTML = trHTML;
+    }
+  };
+
+
 }
 
 function actualizarEstudiante(id) {
