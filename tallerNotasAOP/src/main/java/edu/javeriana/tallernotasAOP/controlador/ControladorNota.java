@@ -1,9 +1,11 @@
 package edu.javeriana.tallernotasAOP.controlador;
 
 import edu.javeriana.tallernotasAOP.excepcion.RegistroNoEncontradoException;
+import edu.javeriana.tallernotasAOP.modelo.Estudiante;
 import edu.javeriana.tallernotasAOP.modelo.Nota;
 import edu.javeriana.tallernotasAOP.repositorio.RepositorioNota;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,27 @@ public class ControladorNota {
     public Nota creaNota(@RequestBody  Nota nota) {
         return repositorioNota.save(nota);
     }
+
+    
+    @DeleteMapping("/nota/borra/{id}")
+    public ResponseEntity<HttpStatus> borraNota(@PathVariable Integer id) {
+        Nota notaBorrar = repositorioNota.findById(id).orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con id: " + id));
+        repositorioNota.delete(notaBorrar);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // @PutMapping("/act/{id}")
+    // public Nota actualizaNota(@PathVariable Integer id, @RequestBody Nota notaAc) {
+    //     Nota notaActualizada = repositorioNota.findById(id)
+    //             .orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con el id: " + id));
+        
+    //     notaActualizada.setObservacion(String.valueOf(notaAc.getObservacion()));
+    //     nuevoEstudiante.setNombre(estudiante.getNombre());
+    //     nuevoEstudiante.setApellido(estudiante.getApellido());
+    //     nuevoEstudiante.setCorreo(estudiante.getCorreo());
+
+    //     return  repositorioEstudiante.save(nuevoEstudiante);   //ResponseEntity.ok(nuevoEstudiante);
+    // }
 
 
 }

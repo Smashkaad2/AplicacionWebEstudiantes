@@ -85,7 +85,7 @@ function mostrarNotasEstudiante(id) {
         trHTML +=
           '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
         trHTML +=
-          '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
+          '<button type="button" class="btn btn-outline-danger" onclick="borrarNota(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
       }
       document.getElementById("mytableNotas").innerHTML = trHTML;
@@ -152,6 +152,7 @@ function editarEstudiante(id) {
     }
   };
 }
+
 function borrarEstudiante(id) {
   const xhttp = new XMLHttpRequest();
   xhttp.open("DELETE", "http://localhost:8080/api/borra/" + id);
@@ -168,3 +169,79 @@ function borrarEstudiante(id) {
     }
   };
 }
+
+function editarNota(id) {
+  const nombre = document.getElementById("observaciones").value;
+  const apellido = document.getElementById("valor").value;
+  const correo = document.getElementById("porcentaje").value;
+
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", "http://localhost:8080/api/act/" + id);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(
+    JSON.stringify({
+      id: id,
+      nombre: nombre,
+      apellido: apellido,
+      correo: correo,
+    })
+  );
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      const objects = JSON.parse(this.responseText);
+      Swal.fire(objects["message"]);
+      cargaEstudiantes();
+    }
+  };
+}
+
+function borrarNota(id) {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("DELETE", "http://localhost:8080/api/nota/borra/" + id);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(
+    JSON.stringify({
+      id: id,
+    })
+  );
+  xhttp.onreadystatechange = function () {
+    if (this.status == 204) {
+      Swal.fire("Nota Borrada");
+      cargaEstudiantes();
+    }
+  };
+}
+
+function actualizarNota(id) {
+  console.log(id);
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "http://localhost:8080/api/notas/" + id);
+  xhttp.send();
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      const obj = JSON.parse(this.responseText);
+      console.log(obj.nombre);
+      Swal.fire({
+        title: "Editar Nota",
+        html:
+          '<input id="id" type="hidden" value=' +
+          obj.id +
+          ">" +
+          '<input id="nombre" class="swal2-input" placeholder="Nombre" value="' +
+          obj.observaciones +
+          '">' +
+          '<input id="apellido" class="swal2-input" placeholder="Apellido" value="' +
+          obj.valor +
+          '">' +
+          '<input id="correo" class="swal2-input" placeholder="Correo" value="' +
+          obj.porcentaje +
+          '">',
+        focusConfirm: false,
+        preConfirm: () => {
+          editarEstudiante(obj.id);
+        },
+      });
+    }
+  };
+}
+
