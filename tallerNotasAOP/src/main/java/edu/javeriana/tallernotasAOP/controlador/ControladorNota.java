@@ -45,18 +45,17 @@ public class ControladorNota {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // @PutMapping("/act/{id}")
-    // public Nota actualizaNota(@PathVariable Integer id, @RequestBody Nota notaAc) {
-    //     Nota notaActualizada = repositorioNota.findById(id)
-    //             .orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con el id: " + id));
+    @PutMapping("/nota/act/{id}")
+    public Nota actualizaNota(@PathVariable Integer id, @RequestBody Nota notaAc) {
+        Nota notaActualizada = repositorioNota.findById(id)
+                .orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con el id: " + id));
         
-    //     notaActualizada.setObservacion(String.valueOf(notaAc.getObservacion()));
-    //     nuevoEstudiante.setNombre(estudiante.getNombre());
-    //     nuevoEstudiante.setApellido(estudiante.getApellido());
-    //     nuevoEstudiante.setCorreo(estudiante.getCorreo());
-
-    //     return  repositorioEstudiante.save(nuevoEstudiante);   //ResponseEntity.ok(nuevoEstudiante);
-    // }
+        notaActualizada.setObservacion(notaAc.getObservacion());
+        notaActualizada.setValor(notaAc.getValor());
+        notaActualizada.setPorcentaje(notaAc.getPorcentaje());
+    
+        return  repositorioNota.save(notaActualizada);   //ResponseEntity.ok(nuevoEstudiante);
+    }
 
 
 }

@@ -39,7 +39,7 @@ function edicionEstudiante() {
     preConfirm: () => {
       creaEstudiante();
     },
-  });
+  }); 
 }
 
 function creaEstudiante() {
@@ -83,7 +83,7 @@ function mostrarNotasEstudiante(id) {
         trHTML += "<td>" + object["valor"] + "</td>";
         trHTML += "<td>" + object["porcentaje"] + "</td>";
         trHTML +=
-          '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
+          '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarNota(' + object["id"] + ')">Editar</button>';
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarNota(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
@@ -215,7 +215,7 @@ function borrarNota(id) {
 function actualizarNota(id) {
   console.log(id);
   const xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "http://localhost:8080/api/notas/" + id);
+  xhttp.open("GET", "http://localhost:8080/api/nota/" + id);
   xhttp.send();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
@@ -235,12 +235,41 @@ function actualizarNota(id) {
           '">' +
           '<input id="correo" class="swal2-input" placeholder="Correo" value="' +
           obj.porcentaje +
-          '">',
+          '">'+
+          '<input id="id" type="hidden" value=' +
+          obj.estudiante_id +
+          ">",
         focusConfirm: false,
         preConfirm: () => {
-          editarEstudiante(obj.id);
+          editarNota(obj.id);
         },
       });
+    }
+  };
+}
+
+function editarNota(id) {
+  const observacion = document.getElementById("observacion").value;
+  const valor = document.getElementById("valor").value;
+  const porcentaje = document.getElementById("porcentaje").value;
+  const estudiante_id = document.getElementById("estudiante_id").value;
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", "http://localhost:8080/api/nota/act/" + id);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(
+    JSON.stringify({
+      id: id,
+      observacion: observacion,
+      valor: valor,
+      porcentaje: porcentaje,
+      estudiante_id: estudiante_id,
+    })
+  );
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      const objects = JSON.parse(this.responseText);
+      Swal.fire(objects["message"]);
+      mostrarNotasEstudiante(estudiante_id);
     }
   };
 }
