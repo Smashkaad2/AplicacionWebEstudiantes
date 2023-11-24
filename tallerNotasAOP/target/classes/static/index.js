@@ -16,7 +16,7 @@ function cargaEstudiantes() {
         trHTML +=
           '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
         trHTML +=
-          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object["id"] + ')">Notas</button>';
+          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object.id + ',\'' +  object.nombre + '\')">Notas</button>';
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
@@ -66,13 +66,16 @@ function creaEstudiante() {
   };
 }
 
-function mostrarNotasEstudiante(id) {
+function mostrarNotasEstudiante(id, nombre) {
   console.log("Flga");
   const xhttp = new XMLHttpRequest();
   xhttp.open("GET", "http://localhost:8080/api/estudiante/" + id);
   xhttp.send();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
+    console.log(nombre);
+      document.getElementById("notaEstudianteTexto").innerHTML = '<h2>Nota del Estudiante: '+ nombre +'</h2>';
+      //notaText.innerHTML = "Notas del estudiante " + nombre;
       console.log(this.responseText);
       var trHTML = "";
       const objects = JSON.parse(this.responseText);
@@ -170,30 +173,30 @@ function borrarEstudiante(id) {
   };
 }
 
-function editarNota(id) {
-  const nombre = document.getElementById("observaciones").value;
-  const apellido = document.getElementById("valor").value;
-  const correo = document.getElementById("porcentaje").value;
+// function editarNota(id) {
+//   const nombre = document.getElementById("observaciones").value;
+//   const apellido = document.getElementById("valor").value;
+//   const correo = document.getElementById("porcentaje").value;
 
-  const xhttp = new XMLHttpRequest();
-  xhttp.open("PUT", "http://localhost:8080/api/act/" + id);
-  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhttp.send(
-    JSON.stringify({
-      id: id,
-      nombre: nombre,
-      apellido: apellido,
-      correo: correo,
-    })
-  );
-  xhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      const objects = JSON.parse(this.responseText);
-      Swal.fire(objects["message"]);
-      cargaEstudiantes();
-    }
-  };
-}
+//   const xhttp = new XMLHttpRequest();
+//   xhttp.open("PUT", "http://localhost:8080/api/act/" + id);
+//   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//   xhttp.send(
+//     JSON.stringify({
+//       id: id,
+//       nombre: nombre,
+//       apellido: apellido,
+//       correo: correo,
+//     })
+//   );
+//   xhttp.onreadystatechange = function () {
+//     if (this.readyState == 4 && this.status == 200) {
+//       const objects = JSON.parse(this.responseText);
+//       Swal.fire(objects["message"]);
+//       cargaEstudiantes();
+//     }
+//   };
+// }
 
 function borrarNota(id) {
   const xhttp = new XMLHttpRequest();
@@ -227,32 +230,35 @@ function actualizarNota(id) {
           '<input id="id" type="hidden" value=' +
           obj.id +
           ">" +
-          '<input id="nombre" class="swal2-input" placeholder="Nombre" value="' +
+          '<input id="observaciones" class="swal2-input" placeholder="Nombre" value="' +
           obj.observaciones +
           '">' +
-          '<input id="apellido" class="swal2-input" placeholder="Apellido" value="' +
+          '<input id="valor" class="swal2-input" placeholder="Apellido" value="' +
           obj.valor +
           '">' +
-          '<input id="correo" class="swal2-input" placeholder="Correo" value="' +
+          '<input id="porcentaje" class="swal2-input" placeholder="Correo" value="' +
           obj.porcentaje +
-          '">'+
-          '<input id="id" type="hidden" value=' +
-          obj.estudiante_id +
-          ">",
+          '">',
         focusConfirm: false,
         preConfirm: () => {
-          editarNota(obj.id);
+          var observacion = document.getElementById('observaciones').value;
+          var valor = document.getElementById('valor').value;
+          var porcentaje = document.getElementById('porcentaje').value;
+          console.log("Flag");
+          console.log(obj);
+          editarNota(obj.id, observacion,valor,porcentaje);
         },
       });
     }
   };
 }
 
-function editarNota(id) {
-  const observacion = document.getElementById("observacion").value;
-  const valor = document.getElementById("valor").value;
-  const porcentaje = document.getElementById("porcentaje").value;
-  const estudiante_id = document.getElementById("estudiante_id").value;
+function editarNota(id,observacion,valor,porcentaje) {
+  console.log(id);
+  console.log(observacion);
+  console.log(valor);
+  console.log(porcentaje);
+
   const xhttp = new XMLHttpRequest();
   xhttp.open("PUT", "http://localhost:8080/api/nota/act/" + id);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -262,15 +268,16 @@ function editarNota(id) {
       observacion: observacion,
       valor: valor,
       porcentaje: porcentaje,
-      estudiante_id: estudiante_id,
     })
   );
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       const objects = JSON.parse(this.responseText);
       Swal.fire(objects["message"]);
-      mostrarNotasEstudiante(estudiante_id);
+      cargaEstudiantes();
     }
   };
 }
+
+
 
