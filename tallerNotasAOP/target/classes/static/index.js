@@ -16,7 +16,7 @@ function cargaEstudiantes() {
         trHTML +=
           '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
         trHTML +=
-          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object.id + ',\'' +  object.nombre + '\')">Notas</button>';
+          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object.id + ',\'' +  object.nombre + '\',\'' +  object.apellido + '\')">Notas</button>';
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
@@ -38,6 +38,23 @@ function edicionEstudiante() {
     focusConfirm: false,
     preConfirm: () => {
       creaEstudiante();
+    },
+  }); 
+}
+
+
+function edicionNotas() {
+  Swal.fire({
+    title: "Crear Nota",
+    html:
+      '<input id="id" type="hidden">' +
+      '<input id="observacion" class="swal2-input"  placeholder="Observacion">' +
+      '<input id="valor" class="swal2-input" placeholder="Valor">' +
+      '<input id="porcentaje" class="swal2-input" placeholder="Porcentaje">'+
+      '<input id="estudiante_id" class="swal2-input" placeholder="Estudiante_id">',
+    focusConfirm: false,
+    preConfirm: () => {
+      creaNota();
     },
   }); 
 }
@@ -66,7 +83,35 @@ function creaEstudiante() {
   };
 }
 
-function mostrarNotasEstudiante(id, nombre) {
+function creaNota() {
+  const observacion = document.getElementById("observacion").value;
+  const valor = document.getElementById("valor").value;
+  const porcentaje = document.getElementById("porcentaje").value;
+  const estudiante_id = document.getElementById("estudiante_id").value;
+
+
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "http://localhost:8080/api/nota/crea");
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(
+    JSON.stringify({
+      observacion: observacion,
+      valor: valor,
+      porcentaje: porcentaje,
+      estudiante_id: estudiante_id
+    })
+  );
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      const objects = JSON.parse(this.responseText);
+      Swal.fire(objects["message"]);
+      cargaEstudiantes();
+    }
+  };
+}
+
+
+function mostrarNotasEstudiante(id, nombre, apellido) {
   console.log("Flga");
   const xhttp = new XMLHttpRequest();
   xhttp.open("GET", "http://localhost:8080/api/estudiante/" + id);
@@ -74,7 +119,8 @@ function mostrarNotasEstudiante(id, nombre) {
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
     console.log(nombre);
-      document.getElementById("notaEstudianteTexto").innerHTML = '<h2>Nota del Estudiante: '+ nombre +'</h2>';
+    console.log(apellido);
+      document.getElementById("notaEstudianteTexto").innerHTML = '<h2>Nota del Estudiante Teoria de La Computacion: '+ nombre +' '+ apellido+'</h2>';
       //notaText.innerHTML = "Notas del estudiante " + nombre;
       console.log(this.responseText);
       var trHTML = "";
