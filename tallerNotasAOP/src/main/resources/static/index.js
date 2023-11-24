@@ -16,7 +16,7 @@ function cargaEstudiantes() {
         trHTML +=
           '<td><button type="button" class="btn btn-outline-secondary" onclick="actualizarEstudiante(' + object["id"] + ')">Editar</button>';
         trHTML +=
-          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object.id + ',\'' +  object.nombre + '\',\'' +  object.apellido + '\')">Notas</button>';
+          '<button type="button" class="btn btn-outline-secondary" onclick="mostrarNotasEstudiante(' + object.id + ',\'' + object.nombre + '\',\'' + object.apellido + '\')">Notas</button>';
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarEstudiante(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
@@ -39,7 +39,7 @@ function edicionEstudiante() {
     preConfirm: () => {
       creaEstudiante();
     },
-  }); 
+  });
 }
 
 
@@ -50,13 +50,13 @@ function edicionNotas() {
       '<input id="id" type="hidden">' +
       '<input id="observacion" class="swal2-input"  placeholder="Observacion">' +
       '<input id="valor" class="swal2-input" placeholder="Valor">' +
-      '<input id="porcentaje" class="swal2-input" placeholder="Porcentaje">'+
+      '<input id="porcentaje" class="swal2-input" placeholder="Porcentaje">' +
       '<input id="estudiante_id" class="swal2-input" placeholder="Estudiante_id">',
     focusConfirm: false,
     preConfirm: () => {
       creaNota();
     },
-  }); 
+  });
 }
 
 function creaEstudiante() {
@@ -112,15 +112,20 @@ function creaNota() {
 
 
 function mostrarNotasEstudiante(id, nombre, apellido) {
+  var prueba;
+  var val;
+  var val2;
+  var final = 0;
+  var finalPor = 0;
   console.log("Flga");
   const xhttp = new XMLHttpRequest();
   xhttp.open("GET", "http://localhost:8080/api/estudiante/" + id);
   xhttp.send();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-    console.log(nombre);
-    console.log(apellido);
-      document.getElementById("notaEstudianteTexto").innerHTML = '<h2>Nota del Estudiante Teoria de La Computacion: '+ nombre +' '+ apellido+'</h2>';
+      console.log(nombre);
+      console.log(apellido);
+      document.getElementById("notaEstudianteTexto").innerHTML = '<h2>Nota del Estudiante Teoria de La Computacion: ' + nombre + ' ' + apellido + '</h2>';
       //notaText.innerHTML = "Notas del estudiante " + nombre;
       console.log(this.responseText);
       var trHTML = "";
@@ -136,9 +141,31 @@ function mostrarNotasEstudiante(id, nombre, apellido) {
         trHTML +=
           '<button type="button" class="btn btn-outline-danger" onclick="borrarNota(' + object["id"] + ')">Borrar</button></td>';
         trHTML += "</tr>";
+
       }
       document.getElementById("mytableNotas").innerHTML = trHTML;
+
+      for (var i = 0; i < objects["notas"].length; i++) {
+        prueba = objects["notas"][i];
+        val = prueba["valor"];
+        final = final + val;
+      }
+
+
+      for (var i = 0; i < objects["notas"].length; i++) {
+        prueba = objects["notas"][i];
+        val2 = prueba["porcentaje"];
+        finalPor = finalPor + val2;
+      }
+
+      final = (final / objects["notas"].length) * (finalPor / 100);
+
+      // prueba = objects["notas"][0];
+      // val = prueba["porcentaje"]; 
+      // console.log(val);
+
     }
+    document.getElementById("notaPromedioEstudiante").innerHTML = '<h2>Con el porcentaje acumulado del ' + finalPor + '% la nota es de: ' + final + '</h2>';
   };
 
 
@@ -292,14 +319,14 @@ function actualizarNota(id) {
           var porcentaje = document.getElementById('porcentaje').value;
           console.log("Flag");
           console.log(obj);
-          editarNota(obj.id, observacion,valor,porcentaje);
+          editarNota(obj.id, observacion, valor, porcentaje);
         },
       });
     }
   };
 }
 
-function editarNota(id,observacion,valor,porcentaje) {
+function editarNota(id, observacion, valor, porcentaje) {
   console.log(id);
   console.log(observacion);
   console.log(valor);
