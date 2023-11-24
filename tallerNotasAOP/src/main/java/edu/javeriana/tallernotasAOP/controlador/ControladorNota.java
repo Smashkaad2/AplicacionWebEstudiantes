@@ -1,9 +1,7 @@
 package edu.javeriana.tallernotasAOP.controlador;
 
-import edu.javeriana.tallernotasAOP.excepcion.RegistroNoEncontradoException;
-import edu.javeriana.tallernotasAOP.modelo.Estudiante;
 import edu.javeriana.tallernotasAOP.modelo.Nota;
-import edu.javeriana.tallernotasAOP.repositorio.RepositorioNota;
+import edu.javeriana.tallernotasAOP.servicio.NotaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,46 +14,31 @@ import java.util.List;
 public class ControladorNota {
 
     @Autowired
-    private RepositorioNota repositorioNota;
+    private NotaService notaService;
 
     @GetMapping("/notas")
     public List<Nota> traerTodas() {
-        return repositorioNota.findAll();
+        return notaService.traerTodas();
     }
 
     @GetMapping("/nota/{id}")
-    public ResponseEntity<Nota> traeNota(@PathVariable Integer id)
-    {
-        Nota nota = repositorioNota.findById(id)
-                .orElseThrow(() -> new RegistroNoEncontradoException("No existe nota con id: " + id));
-
-        return ResponseEntity.ok(nota);
+    public ResponseEntity<Nota> traeNota(@PathVariable Integer id) {
+        return ResponseEntity.ok(notaService.traeNota(id));
     }
 
     @PostMapping("/nota/crea")
-    public Nota creaNota(@RequestBody  Nota nota) {
-        return repositorioNota.save(nota);
+    public Nota creaNota(@RequestBody Nota nota) {
+        return notaService.creaNota(nota);
     }
 
-    
     @DeleteMapping("/nota/borra/{id}")
     public ResponseEntity<HttpStatus> borraNota(@PathVariable Integer id) {
-        Nota notaBorrar = repositorioNota.findById(id).orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con id: " + id));
-        repositorioNota.delete(notaBorrar);
+        notaService.borraNota(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/nota/act/{id}")
     public Nota actualizaNota(@PathVariable Integer id, @RequestBody Nota notaAc) {
-        Nota notaActualizada = repositorioNota.findById(id)
-                .orElseThrow(() -> new RegistroNoEncontradoException("No existe la nota con el id: " + id));
-        
-        notaActualizada.setObservacion(notaAc.getObservacion());
-        notaActualizada.setValor(notaAc.getValor());
-        notaActualizada.setPorcentaje(notaAc.getPorcentaje());
-    
-        return  repositorioNota.save(notaActualizada);   //ResponseEntity.ok(nuevoEstudiante);
+        return notaService.actualizaNota(id, notaAc);
     }
-
-
 }
